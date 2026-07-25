@@ -1,6 +1,6 @@
 import json
 from src.graph.workflow import build_workflow
-from langchain_core.tracers.langchain import wait_for_all_tracers 
+from langchain_core.tracers.langchain import wait_for_all_tracers
 
 
 def run_app():
