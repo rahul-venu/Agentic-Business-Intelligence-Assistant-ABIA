@@ -15,6 +15,35 @@ st.set_page_config(
     layout = "wide"
 )
 
+# -------------------------------------------------------------
+# CUSTOM CSS: Enlarge Input Box, Typed Text, Label & Caption
+# -------------------------------------------------------------
+st.markdown("""
+    <style>
+    /* 1. Caption font size */
+    div[data-testid="stCaptionContainer"] p {
+        font-size: 18px !important;
+    }
+
+    /* 2. "Enter your question:" label size */
+    label[data-testid="stWidgetLabel"] p {
+        font-size: 20px !important;
+        font-weight: 600 !important;
+    }
+
+    /* 3. Input Box height, padding & typed text size */
+    div[data-testid="stTextInput"] input {
+        font-size: 18px !important;
+        height: 60px !important;
+        padding: 12px 18px !important;
+        border-radius: 10px !important;
+    }
+    </style>
+""", 
+unsafe_allow_html=True
+)
+
+
 st.title("📊 ABIA: Agentic Business Intelligence Assistant")
 st.caption("Ask natural language questions about sales, customer segments, products, and regional performance.")
 
