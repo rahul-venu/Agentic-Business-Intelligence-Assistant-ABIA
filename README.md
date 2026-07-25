@@ -1,4 +1,4 @@
-# 📊 ABIA: Agentic Business Intelligence Assistant
+# ABIA: Agentic Business Intelligence Assistant
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-orange.svg)](https://github.com/langchain-ai/langgraph)
@@ -22,34 +22,40 @@ ABIA solves the two most significant hurdles in LLM-powered data analytics: **Ma
 ---
 
 ## 🏗 System Architecture
+```
+The assistant is built as a stateful cyclic graph using LangGraph:
 
-```text
-The assistant is built as a stateful cyclic graph using **LangGraph**:
-┌──────────────────────┐
-              │      User Query      │
-              └──────────┬───────────┘
-                         │
-                         ▼
-                ┌──────────────────┐
-                │   Planner Node   │◄─────────────────┐
-                │  (Groq LLM Plan) │                  │
-                └────────┬─────────┘                  │
-                         │                            │
-                         ▼                            │
-                ┌──────────────────┐                  │
-                │  Validator Node  ├─(Invalid Plan)───┤ (Auto-Retry Loop)
-                │(Schema Guardrails)                  │
-                └────────┬─────────┘                  │
-                         │ (Valid Plan)               │
-                         ▼                            │
-                ┌──────────────────┐                  │
-                │  Executor Node   ├─(Execution Err)──┘
-                │ (Pandas Data Engine)
-                └────────┬─────────┘
-                         │ (Execution Success)
-                         ▼
-                ┌──────────────────┐
-                │  Responder Node  │
-                │(Markdown Table)  │
-                └──────────────────┘
+         ┌──────────────────────┐
+         │      User Query      │
+         └──────────┬───────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│             Planner Node              │◄─────────────────┐
+│           (Groq LLM Plan)             │                  │
+└──────────────────┬────────────────────┘                  │
+                   │                                       │
+                   ▼                                       │
+┌───────────────────────────────────────┐                  │
+│            Validator Node             │                  │
+│          (Schema Guardrails)          │                  │
+└──────────────────┬────────────────────┘                  │
+                   │                                       │
+                   ├───────────────(Invalid Plan)──────────┤
+                   │                                       │ (Auto-Retry Loop)
+                   │ (Valid Plan)                          │
+                   ▼                                       │
+┌───────────────────────────────────────┐                  │
+│             Executor Node             │                  │
+│         (Pandas Data Engine)          │                  │
+└──────────────────┬────────────────────┘                  │
+                   │                                       │
+                   ├───────────────(Execution Err)─────────┘
+                   │
+                   │ (Execution Success)
+                   ▼
+┌───────────────────────────────────────┐
+│            Responder Node             │
+│           (Markdown Table)            │
+└───────────────────────────────────────┘
 ```
