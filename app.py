@@ -1,5 +1,12 @@
+import os
 import streamlit as st
 from src.graph.workflow import build_workflow
+
+# Inject Streamlit Cloud Secrets into environment variables for LangChain/Groq
+if hasattr(st, "secrets"):
+    for key, value in st.secrets.items():
+        os.environ[str(key)] = str(value)
+
 
 # Page config
 st.set_page_config(
