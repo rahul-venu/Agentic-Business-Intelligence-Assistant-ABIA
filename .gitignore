@@ -1,0 +1,17 @@
+# Environment variables & API keys
+.env
+*.env
+
+# Python artifacts & Virtual environments
+.venv/
+venv/
+ENV/
+__pycache__/
+*.py[cod]
+
+# IDE settings
+.vscode/
+.idea/
+
+# Jupyter Checkpoints
+.ipynb_checkpoints
