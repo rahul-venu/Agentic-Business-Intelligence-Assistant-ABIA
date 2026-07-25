@@ -1,3 +1,5 @@
+# QUERIES FOR INFERENCES
+
 [
   { "id": 1, "query": "Total revenue by region" },
   { "id": 2, "query": "Top 5 products by total revenue" },
