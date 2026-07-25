@@ -23,6 +23,7 @@ ABIA solves the two most significant hurdles in LLM-powered data analytics: **Ma
 
 ## 🏗 System Architecture
 
+```text
 The assistant is built as a stateful cyclic graph using **LangGraph**:
 ┌──────────────────────┐
               │      User Query      │
@@ -51,3 +52,4 @@ The assistant is built as a stateful cyclic graph using **LangGraph**:
                 │  Responder Node  │
                 │(Markdown Table)  │
                 └──────────────────┘
+```
