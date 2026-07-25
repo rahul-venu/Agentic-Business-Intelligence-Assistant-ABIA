@@ -59,3 +59,71 @@ The assistant is built as a stateful cyclic graph using LangGraph:
 │           (Markdown Table)            │
 └───────────────────────────────────────┘
 ```
+### Graph Workflow Components
+* **Planner Node**: Converts natural language into a structured `QueryPlan` JSON using Groq (`llama-3.3-70b-versatile`).
+* **Validator Node**: Checks if referenced tables, columns, and filter values exist in the schema metadata before execution.
+* **Executor Node**: Executes multi-table `INNER`/`LEFT` joins, row filters, `.groupby()`, and `.agg()` in Pandas.
+* **Responder Node**: Formats raw Pandas outputs into clean, human-readable Markdown tables with exact non-exponentiated numbers.
+* **Conditional Routing / Retry Loop**: Captures errors during validation or execution and prompts the planner to self-heal (up to 3 retries).
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **LLM Engine** | Groq API (`llama-3.3-70b-versatile`) |
+| **Agent Orchestration** | LangGraph (`StateGraph`) |
+| **Structured Output** | Pydantic v2 Schema Constraints |
+| **Data Processing Engine** | Pandas |
+| **Tracing & Observability** | LangSmith |
+| **Environment / Config** | Python 3.10+, `python-dotenv` |
+
+---
+
+## 📁 Repository Structure
+
+```
+abia/
+├── .env.example                # Template for required environment variables
+├── .gitignore                  # Git ignore rules
+├── README.md                   # Project documentation
+├── requirements.txt            # Python dependencies for this project
+├── app.py                      # Streamlit app
+├── main.py                     # CLI entrypoint for running test queries
+├── LICENSE                     # MIT License
+│
+├── data/                       # Local relational storage (CSV format)
+|   ├── notebooks/
+|   |   └── sanity_check.py     # Pure Pandas reference script for manual sanity checks
+|   |
+│   ├── customer_data.csv       # (customer_id, signup_date, segment, country, churned)
+│   ├── product_data.csv        # (product_id, category, price, cost)
+│   └── sales_data.csv          # (order_id, date, customer_id, product_id, revenue, quantity, region, channel)
+|
+├── eval/
+│   ├── test_queries.json       # Benchmark evaluation queries
+│   └── syn_datagen.py          # Synthetic dataset generator with domain consistency
+|
+└── src/
+    ├── config/
+    │   └── settings.py         # Project configuration & environment loader
+    ├── schemas/
+    │   └── plan_schema.py      # Pydantic QueryPlan schema definition
+    ├── utils/
+    │   ├── data_loader.py      # Singleton DataLoader with caching
+    │   └── metadata.py         # Schema metadata & categorical sample extractor
+    ├── agents/
+    │   ├── planner.py          # Groq LLM Semantic Compiler
+    │   ├── validator.py        # Schema validation guardrails
+    │   └── executor.py         # Pure Pandas execution engine
+    └── graph/
+        └── workflow.py         # LangGraph State Machine & Conditional Edges
+```
+
+
+
+
+
+
+
