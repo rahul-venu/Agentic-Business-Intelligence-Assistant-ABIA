@@ -1,6 +1,3 @@
-# Agentic-Business-Intelligence-Assistant-ABIA
-Enterprise-grade Agentic BI Assistant built with LangGraph and Pandas. Converts natural language business queries into structured JSON query plans with self-healing schema validation loops.
-=======
 # 📊 ABIA: Agentic Business Intelligence Assistant
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
@@ -24,3 +21,33 @@ ABIA solves the two most significant hurdles in LLM-powered data analytics: **Ma
 
 ---
 
+## 🏗 System Architecture
+
+The assistant is built as a stateful cyclic graph using **LangGraph**:
+┌──────────────────────┐
+              │      User Query      │
+              └──────────┬───────────┘
+                         │
+                         ▼
+                ┌──────────────────┐
+                │   Planner Node   │◄─────────────────┐
+                │  (Groq LLM Plan) │                  │
+                └────────┬─────────┘                  │
+                         │                            │
+                         ▼                            │
+                ┌──────────────────┐                  │
+                │  Validator Node  ├─(Invalid Plan)───┤ (Auto-Retry Loop)
+                │(Schema Guardrails)                  │
+                └────────┬─────────┘                  │
+                         │ (Valid Plan)               │
+                         ▼                            │
+                ┌──────────────────┐                  │
+                │  Executor Node   ├─(Execution Err)──┘
+                │ (Pandas Data Engine)
+                └────────┬─────────┘
+                         │ (Execution Success)
+                         ▼
+                ┌──────────────────┐
+                │  Responder Node  │
+                │(Markdown Table)  │
+                └──────────────────┘
