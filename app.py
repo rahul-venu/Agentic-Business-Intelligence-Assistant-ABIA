@@ -38,11 +38,21 @@ st.markdown("""
         padding: 12px 18px !important;
         border-radius: 10px !important;
     }
+    /* 4. Increase spacing between sidebar example questions */
+    div[data-testid="stSidebar"] div[role="radiogroup"] label {
+        margin-bottom: 16px !important;  /* Change this value for more/less space */
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+    }
+
+    /* Hover effect for sidebar radio items */
+    div[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+    }
     </style>
 """, 
 unsafe_allow_html=True
 )
-
 
 st.title("📊 ABIA: Agentic Business Intelligence Assistant")
 st.caption("Ask natural language questions about sales, customer segments, products, and regional performance.")
