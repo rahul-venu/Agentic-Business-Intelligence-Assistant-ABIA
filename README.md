@@ -131,9 +131,9 @@ abia/
 ├── .env.example                # Environment variable configuration template
 ├── .gitignore                  # Git ignore rules (blocks .env and .venv/)
 ├── LICENSE                     # MIT License
-├── README.md                   # System documentation
+├── README.md                   # Project documentation
 ├── requirements.txt            # Python dependencies
-├── app.py                      # Interactive Streamlit Web App & Executive Dashboard
+├── app.py                      # Interactive Streamlit Web App & Dashboard
 ├── main.py                     # CLI entrypoint for batch benchmark evaluation
 │
 ├── data/                       # Local relational storage (CSV format)
