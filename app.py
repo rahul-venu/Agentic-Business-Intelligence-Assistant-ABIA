@@ -6,9 +6,9 @@ import plotly.express as px
 # -------------------------------------------------------------
 # 1. STREAMLIT CLOUD SECRETS HANDLER
 # -------------------------------------------------------------
-# if hasattr(st, "secrets"):
-#     for key, value in st.secrets.items():
-#         os.environ[str(key)] = str(value)
+if hasattr(st, "secrets"):
+    for key, value in st.secrets.items():
+        os.environ[str(key)] = str(value)
 
 from src.graph.workflow import build_workflow
 
