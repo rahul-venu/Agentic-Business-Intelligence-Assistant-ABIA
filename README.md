@@ -139,8 +139,8 @@ abia/
 ├── data/                       # Local relational storage (CSV format)
 │   ├── customer_data.csv       # (customer_id, signup_date, segment, country, churned)
 │   ├── product_data.csv        # (product_id, category, price, cost)
-│   ├── sales_data.csv          # (order_id, date, customer_id, product_id, revenue, quantity, region, 
-|   |                              channel)
+│   ├── sales_data.csv          # (order_id, date, customer_id, product_id, revenue, quantity,  
+|   |                              region, channel)
 │   └── notebooks/
 │       └── sanity_check.py     # Pure Pandas ground-truth verification script
 │
