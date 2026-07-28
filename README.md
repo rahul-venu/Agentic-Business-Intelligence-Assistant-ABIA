@@ -94,7 +94,7 @@ ABIA is built as a stateful cyclic graph using **LangGraph**:
   <tbody>
     <tr style="border: none;">
       <td style="border: none; padding: 8px; font-weight: bold !important;">LLM Engine</td>
-      <td style="border: none; padding: 8px;">Groq API (<code>llama-3.1-8b-instant</code> / <code>llama-3.3-70b-versatile</code>)</td>
+      <td style="border: none; padding: 8px;">Groq API (<code>llama-3.3-70b-versatile</code> / <code>openai/gpt-oss-120b</code>)</td>
     </tr>
     <tr style="border: none;">
       <td style="border: none; padding: 8px; font-weight: bold !important;">Agent Orchestration</td>
