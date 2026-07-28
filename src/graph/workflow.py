@@ -1,6 +1,8 @@
 from typing import TypedDict, Optional, Dict, Any
-from langgraph.graph import StateGraph, END
 import pandas as pd
+from langgraph.graph import StateGraph, END
+from langchain_groq import ChatGroq
+from langchain_core.messages import SystemMessage, HumanMessage
 
 from src.schemas.plan_schema import QueryPlan
 from src.agents.planner import PlannerAgent
@@ -16,7 +18,7 @@ class ABIAState(TypedDict, total=False):
     result_df: Optional[pd.DataFrame]
     formatted_result: Optional[str]
     error: Optional[str]
-    retry_count: int 
+    retry_count: int
 
 def build_workflow():
     dfs = DataLoader.get_dataframes()
@@ -24,7 +26,7 @@ def build_workflow():
 
     planner = PlannerAgent()
     validator = ValidatorAgent(metadata)
-    executor = ExecutorAgent(dfs)  
+    executor = ExecutorAgent(dfs)
 
     def planner_node(state: ABIAState) -> Dict[str, Any]:
         user_query = state.get("user_query", "")
@@ -36,7 +38,6 @@ def build_workflow():
             schema_metadata=metadata,
             error_context=error if error else None
         )
-        
         return {
             "user_query": user_query,
             "plan": plan, 
@@ -68,14 +69,44 @@ def build_workflow():
     def responder_node(state: ABIAState) -> Dict[str, Any]:
         df = state.get("result_df")
         plan = state.get("plan")
-        
+        user_query = state.get("user_query", "")
+
         if df is None or df.empty:
-            summary = "No data matched the query conditions."
-        else:
-            thought = plan.thought_process if plan else ""
-            summary = f"### Logic Explanation\n{thought}\n\n### Query Result\n"
-            summary += df.to_markdown(index=False, floatfmt=",.2f")
-            
+            return {"formatted_result": "No data matched the query conditions."}
+
+        table_markdown = df.to_markdown(index=False, floatfmt=",.2f")
+
+        # Synthesize Executive Insights via Groq LLM
+        llm_narrative = ""
+        try:
+            llm = ChatGroq(
+                groq_api_key=settings.GROQ_API_KEY,
+                model_name=settings.MODEL_NAME,
+                temperature=0.2
+            )
+            prompt_content = f"""You are a Senior Business Intelligence Analyst.
+Analyze the following aggregated query results computed by Pandas and explain key insights to an executive.
+
+USER QUESTION: {user_query}
+QUERY RESULT DATA:
+{table_markdown}
+
+STRICT RULES:
+1. Provide a direct summary answer to the user's question first.
+2. Highlight key observations, top performers, trends, or anomalies in 2-3 concise bullet points.
+3. DO NOT invent or alter any numbers not present in the data table.
+"""
+            response = llm.invoke([
+                SystemMessage(content=prompt_content),
+                HumanMessage(content="Provide the executive insight narrative.")
+            ])
+            llm_narrative = f"\n\n### 💡 Executive Insights\n{response.content}\n"
+        except Exception:
+            llm_narrative = ""
+
+        thought = plan.thought_process if plan else ""
+        summary = f"### 🧠 Logic Explanation\n{thought}\n\n### 📊 Data Result\n{table_markdown}{llm_narrative}"
+
         return {"formatted_result": summary}
 
     # Conditional Routing Logic
@@ -92,8 +123,7 @@ def build_workflow():
                 return "planner"
             return END
         return "responder"
-    
-    # Define Graph
+
     workflow = StateGraph(ABIAState)
 
     workflow.add_node("planner", planner_node)
@@ -103,10 +133,10 @@ def build_workflow():
 
     workflow.set_entry_point("planner")
     workflow.add_edge("planner", "validator")
-    
+
     workflow.add_conditional_edges("validator", route_validation)
     workflow.add_conditional_edges("executor", route_execution)
-    
+
     workflow.add_edge("responder", END)
 
     return workflow.compile()
