@@ -1,4 +1,4 @@
-# ABIA: Agentic Business Intelligence Assistant & Dashboard
+# ABIA: Agentic Business Intelligence Assistant 
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![Orchestration - LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-orange.svg)](https://github.com/langchain-ai/langgraph)
