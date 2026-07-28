@@ -241,7 +241,7 @@ python main.py
 
 ABIA is deployed and running live on **Streamlit Community Cloud**:
 
-👉 **[Launch Live Interactive Dashboard](https://abia-ai.streamlit.app/)**
+🚀 **[Launch Live Interactive Dashboard](https://abia-ai.streamlit.app/)**
 
 ABIA is designed to deploy to Streamlit Community Cloud with secret management and full LangSmith tracing.
 Streamlit Secrets Configuration
