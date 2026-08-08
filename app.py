@@ -3,7 +3,6 @@ import os
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-
 from src.graph.workflow import build_workflow
 
 # -------------------------------------------------------------

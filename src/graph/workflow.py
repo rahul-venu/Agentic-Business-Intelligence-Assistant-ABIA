@@ -1,16 +1,18 @@
-from typing import TypedDict, Optional, Dict, Any
-import pandas as pd
-from langgraph.graph import StateGraph, END
-from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
+from typing import Any, Dict, Optional, TypedDict
 
-from src.schemas.plan_schema import QueryPlan
+import pandas as pd
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
+from langgraph.graph import END, StateGraph
+
+from src.agents.executor import ExecutorAgent
 from src.agents.planner import PlannerAgent
 from src.agents.validator import ValidatorAgent
-from src.agents.executor import ExecutorAgent
+from src.config.settings import settings
+from src.schemas.plan_schema import QueryPlan
 from src.utils.data_loader import DataLoader
 from src.utils.metadata import extract_schema_metadata
-from src.config.settings import settings
+
 
 class ABIAState(TypedDict, total=False):
     user_query: str
@@ -19,6 +21,7 @@ class ABIAState(TypedDict, total=False):
     formatted_result: Optional[str]
     error: Optional[str]
     retry_count: int
+
 
 def build_workflow():
     dfs = DataLoader.get_dataframes()
@@ -36,13 +39,13 @@ def build_workflow():
         plan = planner.plan(
             user_query=user_query,
             schema_metadata=metadata,
-            error_context=error if error else None
+            error_context=error if error else None,
         )
         return {
             "user_query": user_query,
-            "plan": plan, 
-            "error": None, 
-            "retry_count": retry_count + 1
+            "plan": plan,
+            "error": None,
+            "retry_count": retry_count + 1,
         }
 
     def validator_node(state: ABIAState) -> Dict[str, Any]:
@@ -82,7 +85,7 @@ def build_workflow():
             llm = ChatGroq(
                 groq_api_key=settings.GROQ_API_KEY,
                 model_name=settings.MODEL_NAME,
-                temperature=0.2
+                temperature=0.2,
             )
             prompt_content = f"""You are a Senior Business Intelligence Analyst.
 Analyze the following aggregated query results computed by Pandas and explain key insights to an executive.
@@ -96,10 +99,12 @@ STRICT RULES:
 2. Highlight key observations, top performers, trends, or anomalies in 2-3 concise bullet points.
 3. DO NOT invent or alter any numbers not present in the data table.
 """
-            response = llm.invoke([
-                SystemMessage(content=prompt_content),
-                HumanMessage(content="Provide the executive insight narrative.")
-            ])
+            response = llm.invoke(
+                [
+                    SystemMessage(content=prompt_content),
+                    HumanMessage(content="Provide the executive insight narrative."),
+                ]
+            )
             llm_narrative = f"\n\n### 💡 Executive Insights\n{response.content}\n"
         except Exception:
             llm_narrative = ""

@@ -1,6 +1,7 @@
 import json
-from src.graph.workflow import build_workflow
+
 from langchain_core.tracers.langchain import wait_for_all_tracers
+from src.graph.workflow import build_workflow
 
 
 def run_app():
@@ -12,15 +13,11 @@ def run_app():
 
     for item in queries:
         query = item["query"]
-        print("="*60)
+        print("=" * 60)
         print(f"USER QUERY: {query}")
-        print("="*60)
-        
-        initial_state = {
-            "user_query": query,
-            "retry_count": 0,
-            "error": None
-        }
+        print("=" * 60)
+
+        initial_state = {"user_query": query, "retry_count": 0, "error": None}
 
         # Execute Graph
         final_state = app.invoke(initial_state)
@@ -30,6 +27,7 @@ def run_app():
         else:
             print(final_state["formatted_result"])
             print("\n")
+
 
 if __name__ == "__main__":
     try:

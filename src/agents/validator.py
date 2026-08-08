@@ -1,5 +1,7 @@
-from src.schemas.plan_schema import QueryPlan, JoinSpec
-from typing import Dict, Any, Tuple
+from typing import Any, Dict, Tuple
+
+from src.schemas.plan_schema import JoinSpec, QueryPlan
+
 
 class ValidatorAgent:
     def __init__(self, metadata: Dict[str, Any]):
@@ -44,16 +46,20 @@ class ValidatorAgent:
         # Check if customer_data columns are used but table isn't joined
         customer_cols = set(self.metadata.get("customer_data", {}).keys())
         if (referenced_cols & customer_cols) and "customer_data" not in joined_tables:
-            plan.joins.append(JoinSpec(table="customer_data", on="customer_id", how="left"))
+            plan.joins.append(
+                JoinSpec(table="customer_data", on="customer_id", how="left")
+            )
             joined_tables.add("customer_data")
 
         # Check if product_data columns are used but table isn't joined
         product_cols = set(self.metadata.get("product_data", {}).keys())
         if (referenced_cols & product_cols) and "product_data" not in joined_tables:
-            plan.joins.append(JoinSpec(table="product_data", on="product_id", how="left"))
+            plan.joins.append(
+                JoinSpec(table="product_data", on="product_id", how="left")
+            )
             joined_tables.add("product_data")
 
-    def validate(self, plan: QueryPlan) -> Tuple[bool, str]:
+    def validate(self, plan: QueryPlan) -> tuple[bool, str]:
         # Step 1: Clean and sanitize all prefixes on the QueryPlan object
         self._sanitize_plan(plan)
 
@@ -69,17 +75,23 @@ class ValidatorAgent:
         for join in plan.joins:
             if join.table not in self.metadata:
                 return False, f"Join table '{join.table}' does not exist."
-            
+
             clean_join_on = self._clean_col(join.on)
-            if clean_join_on not in available_columns or clean_join_on not in self.metadata[join.table].keys():
+            if (
+                clean_join_on not in available_columns
+                or clean_join_on not in self.metadata[join.table].keys()
+            ):
                 return False, f"Join key '{join.on}' missing from base or join table."
-            
+
             available_columns.update(self.metadata[join.table].keys())
 
         # Step 4: Validate filters
         for f in plan.filters:
             if f.column not in available_columns:
-                return False, f"Filter column '{f.column}' is not available in joined tables."
+                return (
+                    False,
+                    f"Filter column '{f.column}' is not available in joined tables.",
+                )
 
         # Step 5: Validate group_by
         for col in plan.group_by:
@@ -93,9 +105,10 @@ class ValidatorAgent:
 
         return True, "Valid Plan"
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # FOR TESTING PURPOSES
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 
 # if __name__ == "__main__":
 #     from src.utils.data_loader import DataLoader
@@ -127,4 +140,4 @@ class ValidatorAgent:
 #         aggregations=[AggregationSpec(column="revenue", function="sum", alias="total_revenue")]
 #     )
 #     is_valid, msg = validator.validate(invalid_plan)
-#     print(f"Test 2 (Invalid Plan) -> Valid: {is_valid} | Result: {msg}")        
+#     print(f"Test 2 (Invalid Plan) -> Valid: {is_valid} | Result: {msg}")

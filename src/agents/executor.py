@@ -1,10 +1,9 @@
-import pandas as pd
 from typing import Dict
-from src.schemas.plan_schema import QueryPlan
 
 import pandas as pd
-from typing import Dict
+
 from src.schemas.plan_schema import QueryPlan
+
 
 class ExecutorAgent:
     def __init__(self, dfs: Dict[str, pd.DataFrame]):
@@ -104,14 +103,22 @@ class ExecutorAgent:
         # 6. Post-aggregation Formula Calculations
         for metric in plan.derived_metrics:
             if metric.formula == "margin_pct":
-                rev_col = next((c for c in df.columns if "revenue" in c.lower()), "revenue")
+                rev_col = next(
+                    (c for c in df.columns if "revenue" in c.lower()), "revenue"
+                )
                 if "cost" in df.columns and rev_col in df.columns:
-                    df[metric.alias] = (((df[rev_col] - df["cost"]) / df[rev_col]) * 100).round(2)
+                    df[metric.alias] = (
+                        ((df[rev_col] - df["cost"]) / df[rev_col]) * 100
+                    ).round(2)
                 elif "profit" in df.columns and rev_col in df.columns:
                     df[metric.alias] = ((df["profit"] / df[rev_col]) * 100).round(2)
             elif metric.formula == "aov":
-                rev_col = next((c for c in df.columns if "revenue" in c.lower()), "revenue")
-                qty_col = next((c for c in df.columns if "quantity" in c.lower()), "quantity")
+                rev_col = next(
+                    (c for c in df.columns if "revenue" in c.lower()), "revenue"
+                )
+                qty_col = next(
+                    (c for c in df.columns if "quantity" in c.lower()), "quantity"
+                )
                 if rev_col in df.columns and qty_col in df.columns:
                     df[metric.alias] = (df[rev_col] / df[qty_col]).round(2)
 
@@ -124,9 +131,10 @@ class ExecutorAgent:
 
         return df
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # FOR TESTING PURPOSES
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 
 # if __name__ == "__main__":
 #     from src.utils.data_loader import DataLoader
@@ -158,4 +166,4 @@ class ExecutorAgent:
 #         aggregations=[AggregationSpec(column="revenue", function="sum", alias="total_revenue")]
 #     )
 #     print("\n--- Test 2: Revenue by Segment in Europe ---")
-#     print(executor.execute(plan_2))    
+#     print(executor.execute(plan_2))

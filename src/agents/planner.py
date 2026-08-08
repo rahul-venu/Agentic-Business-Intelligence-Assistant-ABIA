@@ -1,19 +1,24 @@
 import json
+
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
-from src.schemas.plan_schema import QueryPlan
+
 from src.config.settings import settings
+from src.schemas.plan_schema import QueryPlan
+
 
 class PlannerAgent:
     def __init__(self):
         llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
             model_name=settings.MODEL_NAME,
-            temperature=0.0
+            temperature=0.0,
         )
         self.structured_llm = llm.with_structured_output(QueryPlan)
 
-    def plan(self, user_query: str, schema_metadata: dict, error_context: str = None) -> QueryPlan:
+    def plan(
+        self, user_query: str, schema_metadata: dict, error_context: str = None
+    ) -> QueryPlan:
         metadata_str = json.dumps(schema_metadata, indent=2)
 
         system_content = f"""You are an expert Data Intelligence Planner.
@@ -65,15 +70,15 @@ STRICT RULES:
 
         messages = [
             SystemMessage(content=system_content),
-            HumanMessage(content=user_query)
+            HumanMessage(content=user_query),
         ]
 
         return self.structured_llm.invoke(messages)
-    
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # FOR TESTING PURPOSES
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 
 # if __name__ == "__main__":
 #     from src.utils.data_loader import DataLoader
@@ -89,5 +94,5 @@ STRICT RULES:
 #     print(f"Testing Query: {query}")
 #     print("=" * 60)
 
-    # plan = planner.plan(user_query=query, schema_metadata=metadata)
-    # print(json.dumps(plan.model_dump(), indent=2))
+# plan = planner.plan(user_query=query, schema_metadata=metadata)
+# print(json.dumps(plan.model_dump(), indent=2))
