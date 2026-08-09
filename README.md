@@ -10,7 +10,7 @@
 
 **ABIA** (Agentic Business Intelligence Assistant) is an enterprise-grade, stateful AI system designed to convert natural language business queries into executable analytical plans over relational datasets.
 
-ABIA eliminates the two biggest risks in LLM-powered analytics: **Mathematical Hallucinations** and **Unsafe Dynamic Code Execution (`exec()`)**.
+ABIA eliminates the two biggest risks in LLM-powered analytics: **Mathematical Hallucinations** and **Unsafe Dynamic Code Execution**.
 
 ---
 ## 🎯 Core Architectural Principles
