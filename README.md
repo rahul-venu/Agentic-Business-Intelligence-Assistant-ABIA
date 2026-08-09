@@ -120,6 +120,10 @@ ABIA is built as a stateful cyclic graph using **LangGraph**:
       <td style="border: none; padding: 8px; font-weight: bold !important;">Observability</td>
       <td style="border: none; padding: 8px;">LangSmith (Full state & prompt execution tracing)</td>
     </tr>
+    <tr style="border: none;">
+      <td style="border: none; padding: 8px; font-weight: bold !important;">Dependency Management</td>
+      <td style="border: none; padding: 8px;">uv (Fast Python package & project manager)</td>
+    </tr>
   </tbody>
 </table>
 
@@ -130,9 +134,11 @@ ABIA is built as a stateful cyclic graph using **LangGraph**:
 abia/
 ├── .env.example                # Environment variable configuration template
 ├── .gitignore                  # Git ignore rules (blocks .env and .venv/)
+├── .python-version             # Python Version
 ├── LICENSE                     # MIT License
 ├── README.md                   # Project documentation
-├── requirements.txt            # Python dependencies
+├── pyproject.toml              # Python dependency + project metadata
+├── uv.lock                     # Reproducible lockfile
 ├── app.py                      # Interactive Streamlit Web App & Dashboard
 ├── main.py                     # CLI entrypoint for batch benchmark evaluation
 │
@@ -171,31 +177,38 @@ abia/
 
 Python 3.10+
 
+[uv](https://docs.astral.sh/uv/) (fast Python package/project manager)
+
 Groq API Key (_[Get a free key here](https://groq.com)_)
 
 LangSmith API Key (*Optional, for execution tracing*)
 
 ## 2. Installation
 
-Clone the repository and set up your virtual environment:
+Clone the repository and set up your environment:
 
 ```bash
 # Clone repository
 git clone https://github.com/your-username/abia.git
 cd abia
 
-# Create virtual environment
-python -m venv .venv
-
-# Activate virtual environment
-
-# On Windows (PowerShell):
-.venv\Scripts\Activate.ps1
+# Install uv (skip if already installed)
 # On macOS/Linux:
-source .venv/bin/activate
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# On Windows (PowerShell):
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-# Install dependencies
-pip install -r requirements.txt
+# Sync dependencies (creates .venv and installs everything automatically)
+uv sync
+```
+
+That's it — no manual venv creation or activation needed. `uv sync` reads `pyproject.toml` and `uv.lock` and builds the environment for you.
+
+To run any command inside the environment, prefix it with `uv run`, e.g :
+
+```bash
+uv run python main.py
+uv run streamlit run app.py
 ```
 
 ## 3. Environment Setup
@@ -217,7 +230,7 @@ LANGCHAIN_PROJECT="ABIA"
 Generate domain-consistent, correlated synthetic CSV datasets inside data/:
 
 ```bash
-python eval/syn_datagen.py
+uv run python eval/syn_datagen.py
 ```
 ---
 ## 💻 Running the System
@@ -227,14 +240,14 @@ Option A: Interactive Streamlit Web Dashboard (Recommended)
 Launch the web app featuring adaptive KPI summary cards, custom CSS styling, dynamic Plotly charts, and one-click CSV exporting:
 
 ```bash
-streamlit run app.py
+uv run streamlit run app.py
 ```
 
 Option B: CLI Batch Test Runner
 
 Execute benchmark questions defined in eval/test_queries.json:
 ```bash
-python main.py
+uv run python main.py
 ```
 ---
 ## 🌐 Live Cloud Deployment
@@ -260,7 +273,7 @@ LANGCHAIN_PROJECT = "ABIA"
 
 To verify that agent execution matches raw dataset calculations down to the cent, run the pure Pandas benchmark script:
 ```bash
-python data/notebooks/sanity_check.py
+uv run python data/notebooks/sanity_check.py
 ```
 
 ---
